@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import *
+from time import strftime
 from MyContentAnalyser.models import *
 import json
 
@@ -153,22 +154,15 @@ def Content_Fetch_DateTime(request,channel_id):
         except:
             return Response("Not Found",status=status.HTTP_404_NOT_FOUND)
 
-# @api_view(['GET'])
-# def Content_Fetch_DateTime(request,channel_id):
-#     if request.method == 'GET':
-#         contentfetch = ContentFetchInfo.objects.all()
-#         if channel_id is not None:
-#             contentfetch = contentfetch.filter(content__link__channel_id__icontains=channel_id)
-#         try:
-#             contentfetch_DateTime_serializer = ContentFetchInfoSerializer(contentfetch, many=True)
-#             list_DateTime = contentfetch_DateTime_serializer.data[0]['created']
-#             Date = list_DateTime[0:10]
-#             Time = list_DateTime[11:19]
-#             Time = datetime.strptime(Time, "%H:%M:%S")
-#             Time = Time.strftime("%I:%M:%S %p")
-#             response = {}
-#             response['Date'] = Date
-#             response['Time'] = Time
-#             return Response(response)
-#         except:
-#             return Response("Not Found",status=status.HTTP_404_NOT_FOUND)
+@api_view(['GET'])
+def Fetch_Parameters(request,channel_id):
+      if request.method == "GET":
+         parameters_fetch = Links.objects.all()
+         if channel_id is not None:
+            parameters_fetch = parameters_fetch.filter(channel_id=channel_id)
+         try:
+            parameter_fetch_serializer = LinksSerializer(parameters_fetch, many=True)
+            Parameters_list = parameter_fetch_serializer.data[0]['parameters']
+            return Response((eval(Parameters_list)).keys())
+         except:
+            return Response("Not Found",status=status.HTTP_404_NOT_FOUND)
