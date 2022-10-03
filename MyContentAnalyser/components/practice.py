@@ -13,7 +13,11 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 import gensim
 
-# nltk.download()
+nltk.download('brown')
+nltk.download('word2vec_sample')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+nltk.download('averaged_perceptron_tagger')
 
 class ContentAnalyser():
 

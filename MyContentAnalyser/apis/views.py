@@ -7,7 +7,6 @@ from MyContentAnalyser.models import *
 import json
 
 from MyContentAnalyser.components.scrapper import Scrapper
-# from MyContentAnalyser.components.content_analyser import ContentAnalyser
 from MyContentAnalyser.components.practice import ContentAnalyser
 
 @api_view(['GET', 'POST'])
@@ -51,7 +50,6 @@ def LinksViewSet(request):
       serializer = LinksSerializer(links, many=True)
       return Response(serializer.data)
 
-
 @api_view(['GET'])
 def View_Keyword_Summary(request,channel_id):
     if request.method == 'GET':
@@ -71,9 +69,9 @@ def View_Keyword_Summary(request,channel_id):
          total_count = map_count + unmap_count
          
          Count_dict = dict()
-         Count_dict['total_words_count'] = eval(total_count)
-         Count_dict['mapped_keywords_count'] = eval(map_count)
-         Count_dict['unmapped_keywords_count'] = eval(unmap_count)
+         Count_dict['total_words_count'] = total_count
+         Count_dict['mapped_keywords_count'] = map_count
+         Count_dict['unmapped_keywords_count'] = unmap_count
          
          return Response(Count_dict)
       except:
@@ -92,14 +90,85 @@ def Content_Fetch_Unmapped(request,channel_id):
         except:
             return Response("Not Found",status=status.HTTP_404_NOT_FOUND)
 
-# class ContentViewSet(viewsets.ModelViewSet):
-#    queryset = Content.objects.all()
-#    serializer_class = ContentSerializer
+@api_view(['GET'])
+def Content_Fetch_Mapped(request,channel_id):
+    if request.method == 'GET':
+        contentfetchmapped = MappedKeyWords.objects.all()
+        if channel_id is not None:
+            contentfetchmapped = contentfetchmapped.filter(content_info__content__link__channel_id__icontains=channel_id)
+        contentfetch_mapped_serializer = ContentFetchMappedSerializer(contentfetchmapped, many=True)
+        try:
+            mapped_keywords = contentfetch_mapped_serializer.data[0]['mapped_keywords']
+            mapped_keywords = eval(mapped_keywords)
+            return Response(mapped_keywords)
+        except:
+            return Response("Not Found",status=status.HTTP_404_NOT_FOUND)
 
-# class ContentViewSet(viewsets.ModelViewSet):
-#    queryset = Content.objects.all()
-#    serializer_class = ContentSerializer
+# Returns Proccessed Word response as list
+# Use url viewContentSummary/<channel_id>
+@api_view(['GET'])
+def View_Content_Summary(request,channel_id):
+    if request.method == 'GET':
+        contentfetch = ContentFetchInfo.objects.all()
+        if channel_id is not None:
+            contentfetch = contentfetch.filter(content__link__channel_id__icontains=channel_id)
+        try:
+            contentfetch_serializer = ContentFetchInfoSerializer(contentfetch, many=True)
+            content_summary = contentfetch_serializer.data[0]['processed_words']
+            return Response(eval(content_summary))
+        except:
+            return Response("Not Found",status=status.HTTP_404_NOT_FOUND)
 
-# class ContentViewSet(viewsets.ModelViewSet):
-#    queryset = Content.objects.all()
-#    serializer_class = ContentSerializer
+# Returns Original Content response as string
+# Use url viewOriginalContent/<channel_id>
+@api_view(['GET'])
+def View_Original_Content(request,channel_id):
+    if request.method == 'GET':
+        contentfetch = Content.objects.all()
+        if channel_id is not None:
+            contentfetch = contentfetch.filter(link__channel_id__icontains=channel_id)
+        try:
+            contentfetch_serializer = ContentSerializer(contentfetch, many=True)
+            original_content = contentfetch_serializer.data[0]['main_content']
+            print(type(original_content))
+            return Response(original_content)
+        except:
+            return Response("Not Found")
+
+@api_view(['GET'])
+def Content_Fetch_DateTime(request,channel_id):
+    if request.method == 'GET':
+        contentfetch = ContentFetchInfo.objects.all()
+        if channel_id is not None:
+            contentfetch = contentfetch.filter(content__link__channel_id__icontains=channel_id)
+        try:
+            contentfetch_DateTime_serializer = ContentFetchInfoSerializer(contentfetch, many=True)
+            list_DateTime = contentfetch_DateTime_serializer.data[0]['created']
+            Date = list_DateTime[0:10]
+            Time = list_DateTime[11:19]
+            response = {}
+            response['Date'] = Date
+            response['Time'] = Time
+            return Response(response)
+        except:
+            return Response("Not Found",status=status.HTTP_404_NOT_FOUND)
+
+# @api_view(['GET'])
+# def Content_Fetch_DateTime(request,channel_id):
+#     if request.method == 'GET':
+#         contentfetch = ContentFetchInfo.objects.all()
+#         if channel_id is not None:
+#             contentfetch = contentfetch.filter(content__link__channel_id__icontains=channel_id)
+#         try:
+#             contentfetch_DateTime_serializer = ContentFetchInfoSerializer(contentfetch, many=True)
+#             list_DateTime = contentfetch_DateTime_serializer.data[0]['created']
+#             Date = list_DateTime[0:10]
+#             Time = list_DateTime[11:19]
+#             Time = datetime.strptime(Time, "%H:%M:%S")
+#             Time = Time.strftime("%I:%M:%S %p")
+#             response = {}
+#             response['Date'] = Date
+#             response['Time'] = Time
+#             return Response(response)
+#         except:
+#             return Response("Not Found",status=status.HTTP_404_NOT_FOUND)
