@@ -1,22 +1,33 @@
-# set the base image 
-FROM python:2.7
+# The image you are going to inherit your Dockerfile from
+FROM python:3.8.10
 
-# File Author / Maintainer
-MAINTAINER Basavaraj
+# Necessary, so Docker doesn't buffer the output and that you can see the output
+# of your application (e.g., Django logs) in real-time.
+ENV PYTHONUNBUFFERED 1
 
-#add project files to the usr/src/app folder
-ADD . /usr/src/app
+# Make a directory in your Docker image, which you can use to store your source code
+RUN mkdir /django_recipe_api
 
-#set directoty where CMD will execute 
-WORKDIR /usr/src/app
+# Set the /django_recipe_api directory as the working directory
+WORKDIR /django_recipe_api
 
-COPY requirements.txt ./
+# Copies from your local machine's current directory to the django_recipe_api folder
+# in the Docker image
+COPY . .
 
-# Get pip to download and install requirements:
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy the requirements.txt file adjacent to the Dockerfile
+# to your Docker image
+COPY ./requirements.txt /requirements.txt
 
-# Expose ports
-EXPOSE 8000
+# Install the requirements.txt file in Docker image
+RUN pip install -r /requirements.txt
 
-# default command to execute    
-CMD exec gunicorn djangoapp.wsgi:application --bind 0.0.0.0:8000 --workers 3 
+#install nltk packages
+CMD python
+CMD import nltk
+CMD nltk.download()
+
+# Create a user that can run your container
+RUN adduser user
+USER user
+ENTRYPOINT python manage.py
