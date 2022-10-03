@@ -86,10 +86,10 @@ WSGI_APPLICATION = 'ContentAnalyser.wsgi.application'
 DATABASES = {
     'default': {
     	'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    	'NAME': 'content',
-    	'USER': 'postgres',
-    	'PASSWORD': 'Slime$2496',
-    	'HOST': 'localhost',
+    	'NAME': 'POSMO_content_module',
+    	'USER': 'adminroot',
+    	'PASSWORD': 'password@123',
+    	'HOST': 'inventory.postgres.database.azure.com',
     	'PORT': 5432,
     	}
     }
